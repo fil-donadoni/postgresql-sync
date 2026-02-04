@@ -228,12 +228,11 @@ read_connection_string() {
         error "Formato stringa di connessione non valido"
     fi
 
-    # Se la password non è nella stringa, chiedila
+    # Se la password non è nella stringa, chiedila (opzionale)
     IFS='|' read -r host port db user password <<< "$parsed"
     if [ -z "$password" ]; then
-        read -sp "Password $db_type: " password
+        read -sp "Password $db_type (premi Invio se non richiesta): " password
         echo "" >&2
-        [ -z "$password" ] && error "Password obbligatoria"
     fi
 
     echo "$host|$port|$db|$user|$password"
@@ -257,9 +256,8 @@ read_credentials_manual() {
     read -p "Username $db_type [$4]: " user
     user=${user:-$4}
 
-    read -sp "Password $db_type: " password
+    read -sp "Password $db_type (premi Invio se non richiesta): " password
     echo "" >&2
-    [ -z "$password" ] && error "Password obbligatoria"
 
     echo "$host|$port|$db|$user|$password"
 }
@@ -493,7 +491,7 @@ else
         fi
         IFS='|' read -r SOURCE_HOST SOURCE_PORT SOURCE_DB SOURCE_USER SOURCE_PASSWORD <<< "$SOURCE_CREDS"
         log "Credenziali sorgente da CLI (connection string)"
-    elif [ -n "$CLI_SOURCE_HOST" ] && [ -n "$CLI_SOURCE_DB" ] && [ -n "$CLI_SOURCE_USER" ] && [ -n "$CLI_SOURCE_PASSWORD" ]; then
+    elif [ -n "$CLI_SOURCE_HOST" ] && [ -n "$CLI_SOURCE_DB" ] && [ -n "$CLI_SOURCE_USER" ]; then
         SOURCE_HOST="${CLI_SOURCE_HOST}"
         SOURCE_PORT="${CLI_SOURCE_PORT:-5432}"
         SOURCE_DB="${CLI_SOURCE_DB}"
@@ -516,7 +514,7 @@ if [ -n "$CLI_DEST_CONN" ]; then
     fi
     IFS='|' read -r DEST_HOST DEST_PORT DEST_DB DEST_USER DEST_PASSWORD <<< "$DEST_CREDS"
     log "Credenziali destinazione da CLI (connection string)"
-elif [ -n "$CLI_DEST_HOST" ] && [ -n "$CLI_DEST_DB" ] && [ -n "$CLI_DEST_USER" ] && [ -n "$CLI_DEST_PASSWORD" ]; then
+elif [ -n "$CLI_DEST_HOST" ] && [ -n "$CLI_DEST_DB" ] && [ -n "$CLI_DEST_USER" ]; then
     DEST_HOST="${CLI_DEST_HOST}"
     DEST_PORT="${CLI_DEST_PORT:-5432}"
     DEST_DB="${CLI_DEST_DB}"
